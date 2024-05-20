@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  php-apache:
+    image: php:8.2-apache
+    container_name: php-apache
+    ports:
+      - "8080:80"
+    volumes:
+      - ./backend:/var/www/html
+      # Adicione volumes adicionais conforme necessário para dados persistentes (por exemplo, banco de dados)
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: my_database
+      MYSQL_USER: my_user
+      MYSQL_PASSWORD: my_password
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    # Adicione mais configurações conforme necessário, como configurações de charset e collation
+
+volumes:
+  mysql_data:
