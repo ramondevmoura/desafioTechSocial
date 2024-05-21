@@ -58,7 +58,7 @@ $productValidator = new ProductValidator();
 // Rotas da aplicação
 
 $route = $_GET['route'] ?? '';
-$allowedRoutes = ['login','authenticate', 'home','users', 'orders', 'create_user','update_user', 'delete_user','create_order','update_order', 'delete_order', 'products', 'product_create', 'product_update','product_delete'];
+$allowedRoutes = ['login','register','authenticate', 'home','users', 'orders', 'create_user','update_user', 'delete_user','create_order','update_order', 'delete_order', 'products', 'product_create', 'product_update','product_delete'];
 
 if (!in_array($route, $allowedRoutes)) {
     http_response_code(404);
@@ -85,14 +85,15 @@ switch ($route) {
         $userController->getAllUsers();
         break;
     case 'create_user':
-        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $userData = [
-                'first_name' => $_GET['first_name'] ?? '',
-                'last_name' => $_GET['last_name'] ?? '',
-                'email' => $_GET['email'] ?? '',
-                'document' => $_GET['document'] ?? '',
-                'phone_number' => $_GET['phone_number'] ?? '',
-                'password' => $_GET['password'] ?? '',
+                'first_name' => $_POST['first_name'] ?? '',
+                'last_name' => $_POST['last_name'] ?? '',
+                'email' => $_POST['email'] ?? '',
+                'document' => $_POST['document'] ?? '',
+                'phone_number' => $_POST['phone_number'] ?? '',
+                'birth_date' => $_POST['birth_date'] ?? '',
+                'password' => $_POST['password'] ?? '',
             ];
             $userController = new UserController($userService, $userValidator);
             $userController->createUser($userData);
@@ -100,6 +101,9 @@ switch ($route) {
             http_response_code(405); // Método não permitido
             echo json_encode(['message' => 'Método não permitido']);
         }
+        break;
+    case 'register':
+        include('register.php');
         break;
     case 'update_user':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {

@@ -45,6 +45,9 @@
         <button type="submit" class="btn btn-primary btn-block">Entrar</button>
     </form>
     <div id="message"></div>
+    <div class="login-link">
+        <p>Fazer cadastro <a href="?route=register">Cadastrar</a>.</p>
+    </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
@@ -53,13 +56,12 @@
 <script>
     $(document).ready(function(){
         $('#login-form').submit(function(e){
-            e.preventDefault(); // Impede o envio do formulário padrão
-
+            e.preventDefault();
             // Envie o formulário usando Ajax
             $.ajax({
                 type: 'POST',
                 url: '?route=authenticate',
-                data: $(this).serialize(), // Serializa os dados do formulário
+                data: $(this).serialize(),
                 success: function(response){
                     var jsonResponse = JSON.parse(response);
                     if (jsonResponse.success) {
@@ -71,7 +73,7 @@
                 },
                 error: function(xhr, status, error){
                     var errorMessage = JSON.parse(xhr.responseText).message;
-                    $('#message').html('<div class="alert alert-danger" role="alert">' + errorMessage + '</div>'); // Exibe mensagem de erro formatada na div #message
+                    $('#message').html('<div class="alert alert-danger" role="alert">' + errorMessage + '</div>');
                 }
             });
         });

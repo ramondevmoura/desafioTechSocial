@@ -124,13 +124,13 @@
         $('.load-content').click(function(e){
             e.preventDefault();
             var page = $(this).data('page');
-            $('.loading').show(); // Exibindo indicador de carregamento
+            $('.loading').show();
             $.ajax({
                 url: page,
                 type: 'GET',
                 dataType: 'json',
                 success: function(response) {
-                    $('.loading').hide(); // Ocultando indicador de carregamento
+                    $('.loading').hide();
                     if (response.success) {
                         if (page === "?route=users") {
                             var users = response.users;
