@@ -2,7 +2,9 @@ version: '3'
 
 services:
   php-apache:
-    image: php:8.2-apache
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: php-apache
     ports:
       - "8080:80"
@@ -18,10 +20,10 @@ services:
     ports:
       - "3306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: example
-      MYSQL_DATABASE: my_database
-      MYSQL_USER: my_user
-      MYSQL_PASSWORD: my_password
+      MYSQL_ROOT_PASSWORD: socialpump
+      MYSQL_DATABASE: db_tech
+      MYSQL_USER: ramon
+      MYSQL_PASSWORD: socialpump
     volumes:
       - ./mysql_data:/var/lib/mysql
     # Adicione mais configurações conforme necessário, como configurações de charset e collation
