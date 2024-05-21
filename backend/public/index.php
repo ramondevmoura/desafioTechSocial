@@ -1,10 +1,11 @@
 <?php
 
-// Carrega o autoload do Composer (se estiver usando)
 
 use app\Controllers\AuthController;
 use app\Controllers\OrderController;
+use app\Controllers\ProductController;
 use app\Controllers\UserController;
+use app\Services\ProductService;
 use Services\OrderService;
 use Services\UserService;
 
@@ -21,6 +22,9 @@ require_once __DIR__ . '/../app/Services/OrderService.php';
 require_once __DIR__ . '/../app/Validators/OrderValidator.php';
 require_once __DIR__ . '/../app/Controllers/AuthController.php';
 require_once __DIR__ . '/../app/Services/AuthService.php';
+require_once __DIR__ . '/../app/Controllers/ProductController.php';
+require_once __DIR__ . '/../app/Services/ProductService.php';
+require_once __DIR__ . '/../app/Validators/ProductValidator.php';
 require_once __DIR__ . '/../database/Database.php';
 require_once __DIR__ . '/../database/database-config.php';
 require_once __DIR__ . '/../database/eloquent.php';
@@ -48,10 +52,13 @@ $orderValidator = new OrderValidator();
 // Instancia os serviços e controladores de autenticação
 $authService = new AuthService($cryptoService);
 
+$productService = new ProductService($conn);
+$productValidator = new ProductValidator();
+
 // Rotas da aplicação
 
 $route = $_GET['route'] ?? '';
-$allowedRoutes = ['authenticate','users', 'orders', 'create_user','update_user', 'delete_user','create_order','update_order', 'delete_order'];
+$allowedRoutes = ['login','authenticate', 'home','users', 'orders', 'create_user','update_user', 'delete_user','create_order','update_order', 'delete_order', 'products', 'product_create', 'product_update','product_delete'];
 
 if (!in_array($route, $allowedRoutes)) {
     http_response_code(404);
@@ -59,6 +66,9 @@ if (!in_array($route, $allowedRoutes)) {
     exit;
 }
 switch ($route) {
+    case 'login':
+        include('login.php');
+        break;
     case 'authenticate':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             (new AuthController())->authenticateUser($authService);
@@ -66,6 +76,9 @@ switch ($route) {
             http_response_code(405); // Método não permitido
             echo json_encode(['message' => 'Método não permitido']);
         }
+        break;
+    case 'home':
+        include('home.php');
         break;
     case 'users':
         $userController = new UserController($userService, $userValidator);
@@ -101,7 +114,6 @@ switch ($route) {
                     'document' => $_GET['document'] ?? '',
                     'phone_number' => $_GET['phone_number'] ?? '',
                 ];
-                var_dump($userData);
                 $userController = new UserController($userService, $userValidator);
                 $userController->updateUser($userId, $userData);
             } else {
@@ -161,7 +173,6 @@ switch ($route) {
                     'quantity' => $_GET['quantity'] ?? '',
                     'price' => $_GET['price'] ?? '',
                 ];
-                var_dump($orderData);
                 $orderController = new OrderController($orderService, $orderValidator);
                 $orderController->updateOrder($orderId, $orderData);
             } else {
@@ -184,6 +195,70 @@ switch ($route) {
             } else {
                 http_response_code(400); // Requisição inválida
                 echo json_encode(['message' => 'ID do usuário não fornecido']);
+            }
+        } else {
+            http_response_code(405); // Método não permitido
+            echo json_encode(['message' => 'Método não permitido']);
+        }
+        break;
+    case 'products':
+        $productController = new ProductController($productService, $productValidator);
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $productController->getAllProducts();
+        } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Lógica para criar um novo produto
+        } else {
+            http_response_code(405);
+            echo json_encode(['message' => 'Método não permitido']);
+        }
+        break;
+    case 'product_create':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $productData = [
+                'name' => $_GET['name'] ?? '',
+                'price' => $_GET['price'] ?? '',
+                'description' => $_GET['description'] ?? '',
+            ];
+            $productController = new ProductController($productService, $productValidator);
+            $productController->createProduct($productData);
+        } else {
+            http_response_code(405); // Método não permitido
+            echo json_encode(['message' => 'Método não permitido']);
+        }
+        break;
+    case 'product_update':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Obtém o ID do usuário a ser atualizado
+            $productId = $_GET['id'] ?? null;
+
+            if ($productId !== null) {
+                $productData = [
+                    'name' => $_GET['name'] ?? '',
+                    'price' => $_GET['price'] ?? '',
+                    'description' => $_GET['description'] ?? '',
+                ];
+                $productController = new ProductController($productService, $productValidator);
+                $productController->updateProduct($productId, $productData);
+            } else {
+                http_response_code(400); // Requisição inválida
+                echo json_encode(['message' => 'ID do produto não fornecido']);
+            }
+        } else {
+            http_response_code(405); // Método não permitido
+            echo json_encode(['message' => 'Método não permitido']);
+        }
+        break;
+    case 'product_delete':
+        if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+            // Obtém o ID do usuário a ser excluído
+            $productId = $_GET['id'] ?? null;
+
+            if ($productId !== null) {
+                $productController = new ProductController($productService, $productValidator);
+                $productController->deleteProduct($productId);
+            } else {
+                http_response_code(400); // Requisição inválida
+                echo json_encode(['message' => 'ID do produto não fornecido']);
             }
         } else {
             http_response_code(405); // Método não permitido

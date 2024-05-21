@@ -13,6 +13,7 @@ class AuthService
 
     public function authenticateUser($email, $password)
     {
+
         $encryptedEmail = $this->cryptoService->encrypt($email);
 
         $user = User::where('email', $encryptedEmail)->first();
@@ -23,7 +24,6 @@ class AuthService
             // Verifica se a senha corresponde à senha armazenada
             if (password_verify($password, $user->password)) {
                 // Inicia a sessão e armazena o ID do usuário
-                session_start();
                 $_SESSION['user_id'] = $user->id;
                 return true;
             }

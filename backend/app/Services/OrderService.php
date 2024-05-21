@@ -24,7 +24,6 @@ class OrderService
         } catch (\Exception $e) {
             // Em caso de erro, registre-o e retorne falso
             error_log('Erro ao criar usuário: ' . $e->getMessage());
-            var_dump($e->getMessage());
             return false;
         }
     }
