@@ -9,7 +9,7 @@ use Services\UserService;
 require '../vendor/autoload.php';
 
 $route = $_GET['route'] ?? '';
-$allowedRoutes = ['users', 'orders', 'create_user'];
+$allowedRoutes = ['users', 'orders', 'create_user','update_user', 'delete_user'];
 
 if (!in_array($route, $allowedRoutes)) {
     http_response_code(404);
@@ -34,9 +34,11 @@ try {
     echo json_encode(array('message' => 'Erro ao conectar ao banco de dados'));
     exit;
 }
+$cryptoService = new CryptoService('techSocialSecretKey');
+
 
 // Instancia os serviços e controladores
-$userService = new UserService($conn);
+$userService = new UserService($cryptoService);
 $userValidator = new UserValidator();
 
 // Rotas da aplicação
@@ -55,7 +57,8 @@ switch ($route) {
                 'first_name' => $_GET['first_name'] ?? '',
                 'last_name' => $_GET['last_name'] ?? '',
                 'email' => $_GET['email'] ?? '',
-                'password' => $_GET['password'] ?? '',
+                'document' => $_GET['document'] ?? '',
+                'phone_number' => $_GET['phone_number'] ?? '',
             ];
             $userController = new UserController($userService, $userValidator);
             $userController->createUser($userData);
@@ -64,10 +67,52 @@ switch ($route) {
             echo json_encode(['message' => 'Método não permitido']);
         }
         break;
+    case 'update_user':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Obtém o ID do usuário a ser atualizado
+            $userId = $_GET['id'] ?? null;
 
+            if ($userId !== null) {
+                $userData = [
+                    'first_name' => $_GET['first_name'] ?? '',
+                    'last_name' => $_GET['last_name'] ?? '',
+                    'email' => $_GET['email'] ?? '',
+                    'document' => $_GET['document'] ?? '',
+                    'phone_number' => $_GET['phone_number'] ?? '',
+                ];
+                var_dump($userData);
+                $userController = new UserController($userService, $userValidator);
+                $userController->updateUser($userId, $userData);
+            } else {
+                http_response_code(400); // Requisição inválida
+                echo json_encode(['message' => 'ID do usuário não fornecido']);
+            }
+        } else {
+            http_response_code(405); // Método não permitido
+            echo json_encode(['message' => 'Método não permitido']);
+        }
+        break;
+    case 'delete_user':
+        if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+            // Obtém o ID do usuário a ser excluído
+            $userId = $_GET['id'] ?? null;
+
+            if ($userId !== null) {
+                $userController = new UserController($userService, $userValidator);
+                $userController->deleteUser($userId);
+            } else {
+                http_response_code(400); // Requisição inválida
+                echo json_encode(['message' => 'ID do usuário não fornecido']);
+            }
+        } else {
+            http_response_code(405); // Método não permitido
+            echo json_encode(['message' => 'Método não permitido']);
+        }
+        break;
     default:
         // Rota padrão ou rota não encontrada
         http_response_code(404);
-        echo json_encode(array('message' => 'Rota não encontrada'));
+        echo json_encode(['message' => 'Rota não encontrada']);
         break;
 }
+

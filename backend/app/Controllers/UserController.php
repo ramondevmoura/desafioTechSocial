@@ -47,4 +47,42 @@ class UserController
             echo json_encode(['success' => false, 'message' => 'Erro ao criar usuário']);
         }
     }
+
+    public function updateUser($id, array $data)
+    {
+
+        // Valida os dados do usuário
+        if (!$this->userValidator->validateUserData($data)) {
+            echo json_encode(['success' => false, 'message' => 'Dados do usuário inválidos']);
+            return;
+        }
+
+        // Remove os campos opcionais se estiverem vazios
+        $userData = [
+            'first_name' => $data['first_name'],
+            'last_name' => $data['last_name'],
+            'email' => $data['email'],
+        ];
+
+        // Tenta atualizar o usuário
+        $success = $this->userService->updateUser($id, $userData);
+
+        if ($success) {
+            echo json_encode(['success' => true, 'message' => 'Usuário atualizado com sucesso']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Erro ao atualizar usuário']);
+        }
+    }
+
+    public function deleteUser($id)
+    {
+        // Tenta excluir o usuário
+        $success = $this->userService->deleteUser($id);
+
+        if ($success) {
+            echo json_encode(['success' => true, 'message' => 'Usuário excluído com sucesso']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Erro ao excluir usuário']);
+        }
+    }
 }
