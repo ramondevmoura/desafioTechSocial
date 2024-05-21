@@ -64,6 +64,7 @@
                     var jsonResponse = JSON.parse(response);
                     if (jsonResponse.success) {
                         $('#message').html('<div class="alert alert-success mt-3" role="alert">Login realizado com sucesso!</div>');
+                        window.location.href = '?route=home';
                     } else {
                         $('#message').html('<div class="alert alert-danger mt-3" role="alert">' + jsonResponse.message + '</div>');
                     }
