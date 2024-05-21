@@ -35,6 +35,7 @@ class UserService
     public function createUser($userData)
     {
         // Criptografa os dados sensíveis antes de persisti-los no banco de dados
+        $userData['password'] = $this->cryptoService->encryptPassword($userData['password']);
         $userData['email'] = $this->cryptoService->encrypt($userData['email']);
         $userData['document'] = $this->cryptoService->encrypt($userData['document']);
         $userData['phone_number'] = $this->cryptoService->encrypt($userData['phone_number']);

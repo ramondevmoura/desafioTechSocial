@@ -23,4 +23,10 @@ class CryptoService
             return null; // Retorna null se os dados forem null
         }
     }
+
+
+    public function encryptPassword($password)
+    {
+        return password_hash($password, PASSWORD_DEFAULT);
+    }
 }

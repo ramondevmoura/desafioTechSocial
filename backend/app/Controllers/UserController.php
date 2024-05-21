@@ -30,7 +30,6 @@ class UserController
 
     public function createUser(array $data)
     {
-
         // Valida os dados do usuário
         if (!$this->userValidator->validateUserData($data)) {
             echo json_encode(['success' => false, 'message' => 'Dados do usuário inválidos']);
@@ -62,6 +61,7 @@ class UserController
             'first_name' => $data['first_name'],
             'last_name' => $data['last_name'],
             'email' => $data['email'],
+            'password' => $data['password']
         ];
 
         // Tenta atualizar o usuário
